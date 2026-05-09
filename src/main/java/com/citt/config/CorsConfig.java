@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// Esta clase configura las políticas de CORS (Cross-Origin Resource Sharing) para la aplicación. Permite que la API REST sea accesible desde cualquier origen, lo que es útil durante el desarrollo y pruebas. Sin embargo, en un entorno de producción, se recomienda restringir los orígenes permitidos para mejorar la seguridad.
 @Configuration
 public class CorsConfig {
     @Bean

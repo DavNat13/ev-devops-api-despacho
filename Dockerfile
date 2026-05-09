@@ -1,4 +1,4 @@
-
+#Etapa 1: Construcción de la aplicación
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 
@@ -7,6 +7,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package -DskipTests
 
+# Etapa 2: Ejecución de la aplicación
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
