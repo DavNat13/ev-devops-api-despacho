@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  # 1. Capa de Datos (Infraestructura)
+  mysql-db:
+    image: mysql:8.0
+    container_name: db-innovatech
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: innovatech_db
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      # Named Volume para persistencia exigida en la pauta
+      - db-data:/var/lib/mysql
+    networks:
+      - back-tier
+
+  # 2. API de Despachos
+  api-despacho:
+    image: ${ECR_REPO_URL_DESPACHO}:latest
+    container_name: api-despacho
+    restart: always
+    ports:
+      - "8081:8080"
+    environment:
+      # Inyección de variables en tiempo de ejecución
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mysql-db
+    networks:
+      - back-tier
+
+  # 3. API de Ventas
+  api-ventas:
+    image: ${ECR_REPO_URL_VENTAS}:latest
+    container_name: api-ventas
+    restart: always
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mysql-db
+    networks:
+      - back-tier
+
+volumes:
+  # Declaración explícita del volumen (Asegura tus puntos en IE2)
+  db-data:
+
+networks:
+  back-tier:
+    driver: bridge
