@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # 1. Capa de Datos (Infraestructura)
+  # 1. Capa de Datos (MySQL 8.0)
   mysql-db:
     image: mysql:8.0
     container_name: db-innovatech
@@ -14,7 +14,6 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # Named Volume para persistencia exigida en la pauta
       - db-data:/var/lib/mysql
     networks:
       - back-tier
@@ -25,10 +24,9 @@ services:
     container_name: api-despacho
     restart: always
     ports:
-      - "8081:8080"
+      - "8081:8081"
     environment:
-      # Inyección de variables en tiempo de ejecución
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     depends_on:
@@ -44,7 +42,8 @@ services:
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC
+      # URL corregida con allowPublicKeyRetrieval para MySQL 8.0
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/innovatech_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     depends_on:
@@ -53,9 +52,10 @@ services:
       - back-tier
 
 volumes:
-  # Declaración explícita del volumen (Asegura tus puntos en IE2)
+  # Definición del volumen nombrado para persistencia de datos
   db-data:
 
 networks:
+  # Red bridge personalizada para aislamiento de microservicios
   back-tier:
     driver: bridge
